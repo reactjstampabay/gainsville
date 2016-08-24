@@ -1,4 +1,10 @@
-import Firebase from 'firebase';
+import firebase from 'firebase';
+const config = {
+  apiKey: "AIzaSyCNZF5DzmuE7dKpJvRJwpBFt3mHJOl6fv0",
+  authDomain: "gainsville.firebaseapp.com",
+  databaseURL: "https://gainsville.firebaseio.com",
+  storageBucket: "firebase-gainsville.appspot.com",
+};
 
 export function getCurrentValue(ref) {
   return new Promise(
@@ -14,7 +20,8 @@ export function getCurrentValue(ref) {
 export function feed() {
   return new Promise(
     (resolve, reject) => {
-      var picturesRef = new Firebase('https://gainsville.firebaseio.com/pictures');
+      firebase.initializeApp(config);
+      var picturesRef = db.ref('/pictures');
       picturesRef.orderByChild('created_at')
         .limitToLast(100)
         .on('value', function(snapshot) {
@@ -33,36 +40,33 @@ export function feed() {
 
 export function login(email, password) {
   return new Promise((resolve, reject) => {
-    var ref = new Firebase('https://gainsville.firebaseio.com');
-    ref.authWithPassword({
-      email: email,
-      password: password
-    }, function(err, userData) {
-      if (err) {
-        if (err.code === 'INVALID_USER') {
-          ref.createUser({
-            email: self.state.email,
-            password: self.state.password
-          }, function(error, userData) {
-            if (error) {
-              return reject(error.message);
-            } else {
-              return resolve(userData);
-            }
-          });
+    firebase.initializeApp(config);
+    firebase.auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(function(result) {
+        resolve(result);
+      })
+      .catch(function(err) {
+        if (err.code === 'auth/user-not-found') {
+          firebase.auth()
+            .createUserWithEmailAndPassword(email, password)
+            .then(function(result) {
+              resolve(result);
+            })
+            .catch(function(err) {
+              reject(err);
+            });
         } else {
-          return reject(err);
+          reject(err);
         }
-      } else {
-        return resolve(userData);
-      }
-    });
+      });
   });
 }
 
 export function like(id) {
   return new Promise(
     (resolve, reject) => {
+      // TODO: Upgrade to new Firebase convention
       var pictureRef = new Firebase('https://gainsville.firebaseio.com/pictures/' + id);
       this.getCurrentValue(pictureRef)
         .then((value) => {
@@ -83,6 +87,7 @@ export function like(id) {
 export function dislike(id) {
   return new Promise(
     (resolve, reject) => {
+      // TODO: Upgrade to new Firebase convention
       var pictureRef = new Firebase('https://gainsville.firebaseio.com/pictures/' + id);
       this.getCurrentValue(pictureRef)
         .then((value) => {

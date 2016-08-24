@@ -1,10 +1,58 @@
 var Promise = require('bluebird');
 var firebase = require('firebase');
 var config = {
-  databaseURL: 'https://gainsville.firebaseio.com',
+  apiKey: "AIzaSyCNZF5DzmuE7dKpJvRJwpBFt3mHJOl6fv0",
+  authDomain: "gainsville.firebaseapp.com",
+  databaseURL: "https://gainsville.firebaseio.com",
+  storageBucket: "firebase-gainsville.appspot.com",
 };
 firebase.initializeApp(config);
 var db = firebase.database();
+
+function feed() {
+  return new Promise(
+    (resolve, reject) => {
+      var picturesRef = db.ref('/pictures');
+      picturesRef.orderByChild('created_at')
+        .limitToLast(100)
+        .on('value', function(snapshot) {
+          var pictureList = snapshot.val();
+          var pictures = [];
+          Object.keys(pictureList).forEach(function(id) {
+            pictureList[id].id = id;
+            pictures.push(pictureList[id]);
+          });
+          picturesRef.off('value');
+          return resolve({pictures: pictures})
+        });
+    }
+  );
+}
+function login(email, password) {
+  return new Promise((resolve, reject) => {
+    firebase.auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(function(result) {
+        console.log(JSON.stringify(result));
+        resolve(result);
+      })
+      .catch(function(err) {
+        if (err.code === 'auth/user-not-found') {
+          firebase.auth()
+            .createUserWithEmailAndPassword(email, password)
+            .then(function(result) {
+              console.log(JSON.stringify(result));
+              resolve(result);
+            })
+            .catch(function(err) {
+              reject(err);
+            });
+        } else {
+          reject(err);
+        }
+      });
+  });
+}
 
 const wrestlers = [
   {url: 'http://3.bp.blogspot.com/_CGdbWRAh_KI/SSdB73ru-bI/AAAAAAAAA5I/8vpX7dAoTxE/s400/HacksawJimDuggan.jpg', user_name: 'Jim'},
@@ -27,6 +75,7 @@ var setPromises = wrestlers.map(function(wrestler) {
 });
 
 Promise.all(setPromises)
+  .then(login('fake@gmail.com', 'password'))
   .then(function() {
     console.log('And there was much rejoicing');
     process.exit(0);
