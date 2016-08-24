@@ -17,6 +17,7 @@
     "uuid": "^2.0.2"
   },
   "devDependencies": {
+    "bluebird": "^3.4.1",
     "gulp": "^3.9.1",
     "gulp-replace": "^0.5.4",
     "gulp-shell": "^0.5.2",
