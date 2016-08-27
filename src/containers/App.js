@@ -1,14 +1,32 @@
 'use strict';
 import React, { Component } from 'react';
 import { Navigator, StyleSheet } from 'react-native';
+import {Provider} from 'react-redux';
+import configureStore from '../common/store/configureStore';
 import StartScreen from './StartScreen';
 import _ from 'lodash';
+
+const store = configureStore();
+
+// Firebase API below
+import { setApi } from '../common/actions/firebase';
+import firebase from 'firebase';
+const config = {
+  apiKey: 'AIzaSyCNZF5DzmuE7dKpJvRJwpBFt3mHJOl6fv0',
+  authDomain: 'gainsville.firebaseapp.com',
+  databaseURL: 'https://gainsville.firebaseio.com',
+  storageBucket: 'firebase-gainsville.appspot.com',
+};
 
 class App extends Component {
   constructor(props) {
     super(props);
-
     this.renderScene = this.renderScene.bind(this);
+  }
+
+  componentWillMount() {
+    firebase.initializeApp(config);
+    store.dispatch(setApi(firebase));
   }
 
   renderScene(route, nav) {
@@ -25,21 +43,23 @@ class App extends Component {
 
   render() {
     return (
-      <Navigator
-        style={[styles.nav]}
-        title="Gainsville"
-        renderScene={this.renderScene}
-        configureScene={(route) => {
-          if (route.sceneConfig) {
-            return route.sceneConfig;
-          }
-          return Navigator.SceneConfigs.FloatFromRight;
-        }}
-        initialRoute={{
-          component: StartScreen, title: 'Welcome to Gainsville'
-        }}>
-      </Navigator>
-    )
+      <Provider store={store}>
+        <Navigator
+          style={[styles.nav]}
+          title="Gainsville"
+          renderScene={this.renderScene}
+          configureScene={(route) => {
+            if (route.sceneConfig) {
+              return route.sceneConfig;
+            }
+            return Navigator.SceneConfigs.FloatFromRight;
+          }}
+          initialRoute={{
+            component: StartScreen, title: 'Welcome to Gainsville'
+          }}>
+        </Navigator>
+      </Provider>
+    );
   }
 }
 

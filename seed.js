@@ -1,3 +1,5 @@
+'use strict';
+
 var Promise = require('bluebird');
 var firebase = require('firebase');
 var config = {
@@ -9,25 +11,39 @@ var config = {
 firebase.initializeApp(config);
 var db = firebase.database();
 
-function feed() {
+function getCurrentValue(ref) {
   return new Promise(
     (resolve, reject) => {
-      var picturesRef = db.ref('/pictures');
-      picturesRef.orderByChild('created_at')
-        .limitToLast(100)
-        .on('value', function(snapshot) {
-          var pictureList = snapshot.val();
-          var pictures = [];
-          Object.keys(pictureList).forEach(function(id) {
-            pictureList[id].id = id;
-            pictures.push(pictureList[id]);
-          });
-          picturesRef.off('value');
-          return resolve({pictures: pictures})
-        });
+      ref.on('value', function(snapshot) {
+        ref.off('value'); // No longer need updates once we have a value
+        return resolve(snapshot.val());
+      });
     }
   );
 }
+
+function like(id, firebase) {
+  return new Promise(
+    (resolve, reject) => {
+      let pictureRef = firebase.database().ref('/pictures/' + id);
+      getCurrentValue(pictureRef)
+        .then((value) => {
+          let nice_gains_bruh = value.nice_gains_bruh || 0;
+          nice_gains_bruh += 1;
+          return pictureRef.update({
+            nice_gains_bruh: nice_gains_bruh
+          });
+        })
+        .then((results) => {
+          resolve(results);
+        })
+        .catch((err) => {
+          return reject(err);
+        })
+    }
+  );
+}
+
 function login(email, password) {
   return new Promise((resolve, reject) => {
     firebase.auth()
@@ -83,3 +99,9 @@ Promise.all(setPromises)
   .catch(function(err) {
     process.exit(err);
   });
+
+// like('fd25475a-20cd-47ae-96be-95c975afa930', firebase)
+//   .then(function(result) {
+//     console.log(result);
+//     process.exit(0);
+//   });

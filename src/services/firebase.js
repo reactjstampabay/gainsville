@@ -1,11 +1,3 @@
-import firebase from 'firebase';
-const config = {
-  apiKey: "AIzaSyCNZF5DzmuE7dKpJvRJwpBFt3mHJOl6fv0",
-  authDomain: "gainsville.firebaseapp.com",
-  databaseURL: "https://gainsville.firebaseio.com",
-  storageBucket: "firebase-gainsville.appspot.com",
-};
-
 export function getCurrentValue(ref) {
   return new Promise(
     (resolve, reject) => {
@@ -17,16 +9,15 @@ export function getCurrentValue(ref) {
   );
 }
 
-export function feed() {
+export function feed(firebase) {
   return new Promise(
     (resolve, reject) => {
-      firebase.initializeApp(config);
-      var picturesRef = db.ref('/pictures');
+      let picturesRef = firebase.database().ref('/pictures');
       picturesRef.orderByChild('created_at')
         .limitToLast(100)
         .on('value', function(snapshot) {
-          var pictureList = snapshot.val();
-          var pictures = [];
+          let pictureList = snapshot.val();
+          let pictures = [];
           Object.keys(pictureList).forEach(function(id) {
             pictureList[id].id = id;
             pictures.push(pictureList[id]);
@@ -38,9 +29,8 @@ export function feed() {
   );
 }
 
-export function login(email, password) {
+export function login(email, password, firebase) {
   return new Promise((resolve, reject) => {
-    firebase.initializeApp(config);
     firebase.auth()
       .signInWithEmailAndPassword(email, password)
       .then(function(result) {
@@ -63,19 +53,17 @@ export function login(email, password) {
   });
 }
 
-export function like(id) {
+export function like(id, firebase) {
   return new Promise(
     (resolve, reject) => {
-      // TODO: Upgrade to new Firebase convention
-      var pictureRef = new Firebase('https://gainsville.firebaseio.com/pictures/' + id);
+      let pictureRef = firebase.database().ref('/pictures/' + id);
       this.getCurrentValue(pictureRef)
         .then((value) => {
-          var nice_gains_bruh = value.nice_gains_bruh || 0;
+          let nice_gains_bruh = value.nice_gains_bruh || 0;
           nice_gains_bruh += 1;
-          pictureRef.update({
+          return pictureRef.update({
             nice_gains_bruh: nice_gains_bruh
           });
-          return resolve(true);
         })
         .catch((err) => {
           return reject(err);
@@ -84,19 +72,17 @@ export function like(id) {
   );
 }
 
-export function dislike(id) {
+export function dislike(id, firebase) {
   return new Promise(
     (resolve, reject) => {
-      // TODO: Upgrade to new Firebase convention
-      var pictureRef = new Firebase('https://gainsville.firebaseio.com/pictures/' + id);
+      let pictureRef = firebase.database().ref('/pictures/' + id);
       this.getCurrentValue(pictureRef)
         .then((value) => {
-          var bruh_do_you_lift = value.bruh_do_you_lift || 0;
+          let bruh_do_you_lift = value.bruh_do_you_lift || 0;
           bruh_do_you_lift += 1;
-          pictureRef.update({
+          return pictureRef.update({
             bruh_do_you_lift: bruh_do_you_lift
           });
-          return resolve(true);
         })
         .catch((err) => {
           return reject(err);
