@@ -9,33 +9,39 @@ import {
   TouchableHighlight
 } from 'react-native';
 
-var window = Dimensions.get('window');
-
+import { connect } from 'react-redux';
+import { refreshPictures } from '../common/actions/gallery';
 import Swiper from '../components/Swiper';
 import NavigationBar from '../components/NavigationBar';
 import GainsvilleCamera from './GainsvilleCamera';
 
+let window = Dimensions.get('window');
+
 class HomeScreen extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {};
-
     this._showYourGains = this._showYourGains.bind(this);
   }
 
+  componentWillMount() {
+    const { dispatch, firebase } = this.props;
+    dispatch(refreshPictures(firebase.api));
+  }
+
   _showYourGains() {
-    this.props.navigator.push({
+    const { navigator, user, firebase } = this.props;
+    navigator.push({
       component: GainsvilleCamera,
-      props: {profile: this.props.profile}
+      props: {user: user, firebase: firebase}
     });
   }
 
   render() {
+    const { user, gallery, firebase, navigator, dispatch } = this.props;
     return (
       <Image style={[styles.background]} source={require('../assets/images/background.png')} resizeMode="cover">
-        <NavigationBar hasLogoutButton={true} navigator={this.props.navigator}></NavigationBar>
-        <Swiper profile={this.props.profile} navigator={this.props.navigator}></Swiper>
+        <NavigationBar hasLogoutButton={true} navigator={navigator}></NavigationBar>
+        <Swiper user={user} gallery={gallery} firebase={firebase} navigator={navigator} dispatch={dispatch}></Swiper>
         <TouchableHighlight onPress={this._showYourGains} style={[styles.cameraButton]}>
           <Text style={[styles.cameraButtonText]}>Show Your Gains</Text>
         </TouchableHighlight>
@@ -70,4 +76,13 @@ var styles = StyleSheet.create({
   }
 });
 
-export default HomeScreen;
+function mapStateToProps(state) {
+  const { user, gallery, firebase } = state;
+  return {
+    user,
+    gallery,
+    firebase
+  };
+}
+
+export default connect(mapStateToProps)(HomeScreen);

@@ -65,6 +65,9 @@ export function like(id, firebase) {
             nice_gains_bruh: nice_gains_bruh
           });
         })
+        .then(() => {
+          resolve(true);
+        })
         .catch((err) => {
           return reject(err);
         })
@@ -83,6 +86,9 @@ export function dislike(id, firebase) {
           return pictureRef.update({
             bruh_do_you_lift: bruh_do_you_lift
           });
+        })
+        .then(() => {
+          resolve(true);
         })
         .catch((err) => {
           return reject(err);

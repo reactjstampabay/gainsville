@@ -1,4 +1,4 @@
-import * as FirebaseService from '../../services/firebase';
+import * as FirebaseService from '../services/firebase';
 
 export const INITIATE_LOGIN = 'INITIATE_LOGIN';
 export const RECEIVE_PROFILE = 'RECEIVE_PROFILE';

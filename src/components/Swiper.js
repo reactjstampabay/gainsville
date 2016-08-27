@@ -10,6 +10,8 @@ import {
   Dimensions,
 } from 'react-native';
 
+import { like, dislike } from '../common/actions/gallery';
+
 import clamp from 'clamp';
 
 var SWIPE_THRESHOLD = 160;
@@ -20,42 +22,25 @@ class Swiper extends Component {
 
     this.state = {
       pan: new Animated.ValueXY(),
-      enter: new Animated.Value(0.5),
-      // TODO: Wire in Redux
-      //person: MediaStore.getState().person,
-      //pictures: MediaStore.getState().pictures
+      enter: new Animated.Value(0.5)
     };
 
     this._animateEntrance = this._animateEntrance.bind(this);
     this._resetState = this._resetState.bind(this);
     this._swipedLeft = this._swipedLeft.bind(this);
     this._swipedRight = this._swipedRight.bind(this);
-    this.onMediaStoreChange = this.onMediaStoreChange.bind(this);
   }
 
   _swipedLeft() {
-    // TODO: Wire in Redux
-    //MediaActions.dislike(this.state.person.id);
+    const { dispatch, gallery, firebase } = this.props;
+    dispatch(dislike(gallery.pictures[gallery.currentIndex].id, firebase.api));
   }
 
   _swipedRight() {
-    // TODO: Wire in Redux
-    //MediaActions.like(this.state.person.id);
+    const { dispatch, gallery, firebase } = this.props;
+    dispatch(like(gallery.pictures[gallery.currentIndex].id, firebase.api));
   }
 
-  onMediaStoreChange(state) {
-    if (!state.error) {
-      this.setState({pictures: state.pictures, person: state.person});
-      this._animateEntrance();
-    }
-  }
-
-  componentDidMount() {
-    var self = this;
-    // TODO: Wire in Redux
-    // MediaStore.listen(this.onMediaStoreChange);
-    // MediaActions.feed();
-  }
 
   _animateEntrance() {
     Animated.spring(
@@ -108,19 +93,18 @@ class Swiper extends Component {
   _resetState() {
     if (this.state.pan.x._value > 0) {
       // Swiped Right
-      console.log('swiped right');
       this._swipedRight();
     } else if (this.state.pan.x._value < 0) {
       // Swiped Left
-      console.log('swiped left');
       this._swipedLeft();
 
     }
     this.state.pan.setValue({x: 0, y: 0});
-    this.state.enter.setValue(0);
+    this.state.enter.setValue(0.5);
   }
 
   render() {
+    const { gallery } = this.props;
     let { pan, enter, } = this.state;
 
     let [translateX, translateY] = [pan.x, pan.y];
@@ -139,10 +123,12 @@ class Swiper extends Component {
     let nopeScale = pan.x.interpolate({inputRange: [-150, 0], outputRange: [1, 0.5], extrapolate: 'clamp'});
     let animatedNopeStyles = {transform: [{scale: nopeScale}], opacity: nopeOpacity}
 
+    let picture = gallery.currentIndex > -1 ? gallery.pictures[gallery.currentIndex] : {url: 'https://gainsville.firebaseapp.com/spinner.gif'};
+
     return (
       <View style={styles.container}>
-        <Animated.View style={[styles.card, animatedCardStyles]} source={{uri: this.state.person}} {...this._panResponder.panHandlers}>
-          <Image style={[styles.card]} source={{uri: this.state.person.url}}></Image>
+        <Animated.View style={[styles.card, animatedCardStyles]} {...this._panResponder.panHandlers}>
+          <Image style={[styles.card]} source={{uri: picture.url}}></Image>
         </Animated.View>
 
         <Animated.View style={[styles.nope, animatedNopeStyles]}>

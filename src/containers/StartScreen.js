@@ -30,23 +30,23 @@ class StartScreen extends Component {
     this.loginOrRegister = this.loginOrRegister.bind(this);
     this.onChangeEmail = this.onChangeEmail.bind(this);
     this.onChangePassword = this.onChangePassword.bind(this);
-    this.navigateToSwiper = this.navigateToSwiper.bind(this);
+    this.navigateToHomeScreen = this.navigateToHomeScreen.bind(this);
     this.showError = this.showError.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
     const { user } = nextProps;
-    if (user.status === 'authorized') {
-      console.log('TODO: Initiate navigateToSwiper');
+    if (this.props.user.status !== 'authorized' && user.status === 'authorized') {
+      this.navigateToHomeScreen();
     }
   }
 
-  navigateToSwiper(userData) {
+  navigateToHomeScreen() {
+    const { navigator } = this.props;
     LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
-    this.props.navigator.replace({
+    navigator.replace({
       title: 'Gainsville',
-      component: HomeScreen,
-      props: {profile: userData}
+      component: HomeScreen
     });
   }
 
@@ -108,6 +108,7 @@ class StartScreen extends Component {
           <View style={[styles.formContainerLast]}>
             {loginButton}
           </View>
+          <Image style={{height: window.height - 80, width: window.height - 80}} source={{uri: 'http://2.bp.blogspot.com/_H8hh1K-R3qo/TUHuC4TMatI/AAAAAAAAAMg/heH-xvbb1Uw/s1600/iron-sheik.JPG'}} />
         </View>
       </Image>
     );
