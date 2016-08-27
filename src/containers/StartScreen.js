@@ -12,8 +12,9 @@ import {
   TouchableHighlight,
   LayoutAnimation
 } from 'react-native';
-
+import { connect } from 'react-redux';
 import HomeScreen from './HomeScreen';
+import { login } from '../common/actions/user';
 
 var window = Dimensions.get('window');
 
@@ -22,10 +23,10 @@ class StartScreen extends Component {
     super(props);
 
     this.state = {
-      loading: false
+      email: null,
+      password: null
     };
 
-    this.onUserStoreChange = this.onUserStoreChange.bind(this);
     this.loginOrRegister = this.loginOrRegister.bind(this);
     this.onChangeEmail = this.onChangeEmail.bind(this);
     this.onChangePassword = this.onChangePassword.bind(this);
@@ -33,24 +34,10 @@ class StartScreen extends Component {
     this.showError = this.showError.bind(this);
   }
 
-  componentDidMount() {
-    // TODO: Wire in Redux
-    //UserStore.listen(this.onUserStoreChange);
-  }
-
-  componentWillUnmount() {
-    // TODO: Wire in Redux
-    //UserStore.unlisten(this.onUserStoreChange);
-  }
-
-  onUserStoreChange(state) {
-    var self = this;
-    if (state.status === 'logging_in') {
-      self.setState({loading: true});
-    } else if (state.error) {
-      self.showError(state.error.message);
-    } else if (state.status === 'authenticated') {
-      self.navigateToSwiper(state.userData);
+  componentWillReceiveProps(nextProps) {
+    const { user } = nextProps;
+    if (user.status === 'authorized') {
+      console.log('TODO: Initiate navigateToSwiper');
     }
   }
 
@@ -69,13 +56,11 @@ class StartScreen extends Component {
   }
 
   loginOrRegister() {
-    var self = this;
+    const { dispatch, firebase } = this.props;
     if (!this.state.email || !this.state.password) {
       self.showError('Bruh, you need to give me an email and a password.');
     } else {
-      // TODO: Wire in Redux
-      // UserActions.startLogin();
-      // UserActions.login(this.state.email, this.state.password);
+      dispatch(login(this.state.email, this.state.password, firebase.api));
     }
   }
 
@@ -88,8 +73,9 @@ class StartScreen extends Component {
   }
 
   render() {
+    const { user } = this.props;
     let loginButton = null;
-    if (this.state.loading) {
+    if (user.status === 'authenticating') {
       loginButton =
         <TouchableHighlight style={[styles.loginButton]}>
           <Text style={[{color: '#fff'}]}>LOGGING IN...</Text>
@@ -190,4 +176,12 @@ var styles = StyleSheet.create({
   }
 });
 
-export default StartScreen;
+function mapStateToProps(state) {
+  const { user, firebase } = state;
+  return {
+    user,
+    firebase
+  };
+}
+
+export default connect(mapStateToProps)(StartScreen);
