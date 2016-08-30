@@ -29,10 +29,10 @@ class HomeScreen extends Component {
   }
 
   _showYourGains() {
-    const { navigator, user, firebase } = this.props;
+    const { navigator, user, firebase, dispatch } = this.props;
     navigator.push({
       component: GainsvilleCamera,
-      props: {user: user, firebase: firebase}
+      props: {user: user, firebase: firebase, dispatch: dispatch}
     });
   }
 

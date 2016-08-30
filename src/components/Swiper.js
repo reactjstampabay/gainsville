@@ -123,7 +123,7 @@ class Swiper extends Component {
     let nopeScale = pan.x.interpolate({inputRange: [-150, 0], outputRange: [1, 0.5], extrapolate: 'clamp'});
     let animatedNopeStyles = {transform: [{scale: nopeScale}], opacity: nopeOpacity}
 
-    let picture = gallery.currentIndex > -1 ? gallery.pictures[gallery.currentIndex] : {url: 'https://gainsville.firebaseapp.com/spinner.gif'};
+    let picture = gallery.currentIndex > -1 && gallery.status === 'refreshed' ? gallery.pictures[gallery.currentIndex] : {url: 'https://gainsville.firebaseapp.com/spinner.gif'};
 
     return (
       <View style={styles.container}>

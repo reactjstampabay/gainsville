@@ -2,10 +2,18 @@ import * as FirebaseService from '../services/firebase';
 
 export const LIKE = 'LIKE';
 export const DISLIKE = 'DISLIKE';
+export const INITIATE_REFRESH_PICTURES = 'INITIATE_REFRESH_PICTURES';
 export const REFRESH_PICTURES = 'REFRESH_PICTURES';
+
+function initiateRefreshPictures() {
+  return {
+    type: INITIATE_REFRESH_PICTURES
+  };
+}
 
 export function refreshPictures(firebase) {
   return dispatch => {
+    dispatch(initiateRefreshPictures());
     FirebaseService.feed(firebase)
       .then(response => {
         dispatch({

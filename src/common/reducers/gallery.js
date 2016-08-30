@@ -1,12 +1,14 @@
 import {
   LIKE,
   DISLIKE,
+  INITIATE_REFRESH_PICTURES,
   REFRESH_PICTURES
 } from '../actions/gallery';
 
 import _ from 'lodash';
 
 const initialState = {
+  status: 'initial',
   liked: [],
   disliked: [],
   pictures: [],
@@ -19,12 +21,20 @@ export const gallery = (state = initialState, action) => {
       return like(state, action);
     case DISLIKE:
       return dislike(state, action);
+    case INITIATE_REFRESH_PICTURES:
+      return initiateRefreshPictures(state);
     case REFRESH_PICTURES:
       return refreshPictures(state, action);
     default:
       return state;
   }
 };
+
+function initiateRefreshPictures(state) {
+  return Object.assign({}, state, {
+    status: 'refreshing'
+  });
+}
 
 function like(state, action) {
   return Object.assign({}, state, {
@@ -48,6 +58,7 @@ function dislike(state, action) {
 
 function refreshPictures(state, action) {
   return Object.assign({}, state, {
+    status: 'refreshed',
     pictures: action.pictures,
     currentIndex: action.pictures.length > 0 ? 0 : -1
   });
