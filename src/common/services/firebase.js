@@ -1,3 +1,5 @@
+import uuid from 'uuid';
+
 export function getCurrentValue(ref) {
   return new Promise(
     (resolve, reject) => {
@@ -41,10 +43,10 @@ export function login(email, password, firebase) {
           firebase.auth()
             .createUserWithEmailAndPassword(email, password)
             .then(function(result) {
-              resolve(result);
+              return resolve(result);
             })
             .catch(function(err) {
-              reject(err);
+              return reject(err);
             });
         } else {
           reject(err);
@@ -66,7 +68,7 @@ export function like(id, firebase) {
           });
         })
         .then(() => {
-          resolve(true);
+          return resolve(true);
         })
         .catch((err) => {
           return reject(err);
@@ -88,11 +90,31 @@ export function dislike(id, firebase) {
           });
         })
         .then(() => {
-          resolve(true);
+          return resolve(true);
         })
         .catch((err) => {
           return reject(err);
         })
+    }
+  );
+}
+
+export function uploadPicture(base64Image, email, firebase) {
+  return new Promise(
+    (resolve, reject) => {
+      let picturesRef = firebase.database().ref('/pictures');
+      picturesRef
+        .child(uuid.v4())
+        .set({
+          url: 'data:image/png;base64,' + base64Image.data,
+          user_name: email
+        })
+        .then(result => {
+          return resolve(result);
+        })
+        .catch(err => {
+          return reject(err);
+        });
     }
   );
 }

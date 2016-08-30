@@ -4,8 +4,7 @@ import React, { Component } from 'react';
 import { View, Dimensions, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import Camera from 'react-native-camera';
 import NavigationBar from '../components/NavigationBar';
-import Firebase from 'firebase';
-import uuid from 'uuid';
+import * as FirebaseService from '../common/services/firebase';
 
 class GainsvilleCamera extends Component {
   constructor(props) {
@@ -15,21 +14,17 @@ class GainsvilleCamera extends Component {
   }
 
   _takePicture() {
+    const { user, firebase, navigator } = this.props;
     var self = this;
     this.camera.capture()
       .then((data) => {
-        var picturesRef = new Firebase('https://gainsville.firebaseio.com/pictures');
-        picturesRef
-          .child(uuid.v4())
-          .set({
-            url: 'data:image/png;base64,' + data,
-            user_name: this.props.email || 'testing'
-          });
-
-        this.props.navigator.pop();
+        return FirebaseService.uploadPicture(data, user.profile.email, firebase.api);
       })
-      .catch(err => {
-        console.error(err)
+      .then(result => {
+        navigator.pop();
+      })
+      .catch(error => {
+        console.log(err);
       });
   }
 

@@ -22,7 +22,7 @@ class Swiper extends Component {
 
     this.state = {
       pan: new Animated.ValueXY(),
-      enter: new Animated.Value(0.5)
+      enter: new Animated.Value(1.0)
     };
 
     this._animateEntrance = this._animateEntrance.bind(this);
@@ -100,7 +100,7 @@ class Swiper extends Component {
 
     }
     this.state.pan.setValue({x: 0, y: 0});
-    this.state.enter.setValue(0.5);
+    this.state.enter.setValue(1.0);
   }
 
   render() {
