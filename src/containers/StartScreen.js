@@ -11,7 +11,8 @@ import {
   Alert,
   TouchableHighlight,
   LayoutAnimation,
-  AsyncStorage
+  AsyncStorage,
+  KeyboardAvoidingView
 } from 'react-native';
 import { connect } from 'react-redux';
 import HomeScreen from './HomeScreen';
@@ -90,30 +91,35 @@ class StartScreen extends Component {
         </TouchableHighlight>;
     }
     return (
-      <Image style={[styles.background]} source={require('../assets/images/background.png')} resizeMode="cover">
-        <View style={[styles.container]}>
-          <Image style={[styles.logo]} resizeMode="stretch"
-                 source={require('../assets/images/logo-main.png')} />
-          <View style={[styles.formContainer]}>
-            <Text style={[styles.formLabel]}>Email</Text>
-            <TextInput style={[styles.formText]}
-                       onChangeText={this.onChangeEmail}>
-            </TextInput>
+      <KeyboardAvoidingView style={[styles.background]} behavior="position">
+        <Image style={[styles.background]} source={require('../assets/images/background.png')} resizeMode="cover">
+          <View style={[styles.container]}>
+            <Image style={[styles.logo]} resizeMode="stretch"
+                   source={require('../assets/images/logo-main.png')}/>
+            <View style={[styles.formContainer]}>
+              <Text style={[styles.formLabel]}>Email</Text>
+              <TextInput style={[styles.formText]}
+                         onChangeText={this.onChangeEmail}>
+              </TextInput>
+            </View>
+            <View style={[styles.formContainer]}>
+              <Text style={[styles.formLabel]}>Password</Text>
+              <TextInput style={[styles.formText]}
+                         secureTextEntry={true}
+                         keyboardType={'email-address'}
+                         onChangeText={this.onChangePassword}>
+              </TextInput>
+            </View>
+            <View style={[styles.formContainerLast]}>
+              {loginButton}
+            </View>
+            <Image style={{
+              height: window.height - 80,
+              width: window.height - 80
+            }} source={{uri: 'http://2.bp.blogspot.com/_H8hh1K-R3qo/TUHuC4TMatI/AAAAAAAAAMg/heH-xvbb1Uw/s1600/iron-sheik.JPG'}}/>
           </View>
-          <View style={[styles.formContainer]}>
-            <Text style={[styles.formLabel]}>Password</Text>
-            <TextInput style={[styles.formText]}
-                       secureTextEntry={true}
-                       keyboardType={'email-address'}
-                       onChangeText={this.onChangePassword}>
-            </TextInput>
-          </View>
-          <View style={[styles.formContainerLast]}>
-            {loginButton}
-          </View>
-          <Image style={{height: window.height - 80, width: window.height - 80}} source={{uri: 'http://2.bp.blogspot.com/_H8hh1K-R3qo/TUHuC4TMatI/AAAAAAAAAMg/heH-xvbb1Uw/s1600/iron-sheik.JPG'}} />
-        </View>
-      </Image>
+        </Image>
+      </KeyboardAvoidingView>
     );
   }
 }
