@@ -1,10 +1,12 @@
 'use strict';
 import React, { Component } from 'react';
-import { Navigator, StyleSheet } from 'react-native';
+import { Navigator, StyleSheet, AsyncStorage } from 'react-native';
 import {Provider} from 'react-redux';
 import configureStore from '../common/store/configureStore';
 import StartScreen from './StartScreen';
 import _ from 'lodash';
+import { receiveProfile } from '../common/actions/user';
+import { ASYNC_STORAGE_KEY } from '../common/constants';
 
 const store = configureStore();
 
@@ -27,6 +29,15 @@ class App extends Component {
   componentWillMount() {
     firebase.initializeApp(config);
     store.dispatch(setApi(firebase));
+  }
+
+  componentDidMount() {
+    AsyncStorage.getItem(ASYNC_STORAGE_KEY)
+      .then(profile => {
+        if (profile) {
+          store.dispatch(receiveProfile(JSON.parse(profile), firebase));
+        }
+      });
   }
 
   renderScene(route, nav) {

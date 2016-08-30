@@ -10,11 +10,13 @@ import {
   Image,
   Alert,
   TouchableHighlight,
-  LayoutAnimation
+  LayoutAnimation,
+  AsyncStorage
 } from 'react-native';
 import { connect } from 'react-redux';
 import HomeScreen from './HomeScreen';
 import { login } from '../common/actions/user';
+import { ASYNC_STORAGE_KEY } from '../common/constants';
 
 var window = Dimensions.get('window');
 
@@ -37,6 +39,7 @@ class StartScreen extends Component {
   componentWillReceiveProps(nextProps) {
     const { user } = nextProps;
     if (this.props.user.status !== 'authorized' && user.status === 'authorized') {
+      AsyncStorage.setItem(ASYNC_STORAGE_KEY, JSON.stringify(user.profile));
       this.navigateToHomeScreen();
     }
   }

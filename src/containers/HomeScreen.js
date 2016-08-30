@@ -40,7 +40,7 @@ class HomeScreen extends Component {
     const { user, gallery, firebase, navigator, dispatch } = this.props;
     return (
       <Image style={[styles.background]} source={require('../assets/images/background.png')} resizeMode="cover">
-        <NavigationBar hasLogoutButton={true} navigator={navigator}></NavigationBar>
+        <NavigationBar hasLogoutButton={true} navigator={navigator} dispatch={dispatch}></NavigationBar>
         <Swiper user={user} gallery={gallery} firebase={firebase} navigator={navigator} dispatch={dispatch}></Swiper>
         <TouchableHighlight onPress={this._showYourGains} style={[styles.cameraButton]}>
           <Text style={[styles.cameraButtonText]}>Show Your Gains</Text>

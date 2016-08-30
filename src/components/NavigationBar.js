@@ -6,10 +6,13 @@ import {
   StyleSheet,
   Dimensions,
   TouchableHighlight,
-  LayoutAnimation
+  LayoutAnimation,
+  AsyncStorage
 } from 'react-native';
 
 import StartScreen from '../containers/StartScreen';
+import { ASYNC_STORAGE_KEY } from '../common/constants';
+import { logout } from '../common/actions/user';
 
 class NavigationBar extends Component {
   constructor(props) {
@@ -20,12 +23,15 @@ class NavigationBar extends Component {
   }
 
   _logout() {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
-    // TODO: Wire in Redux
-    //UserActions.logout();
-    this.props.navigator.replace({
-      component: StartScreen
-    });
+    const { dispatch, navigator } = this.props;
+    AsyncStorage.removeItem(ASYNC_STORAGE_KEY)
+      .then(() => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+        dispatch(logout());
+        navigator.replace({
+          component: StartScreen
+        });
+      });
   }
 
   _back() {
