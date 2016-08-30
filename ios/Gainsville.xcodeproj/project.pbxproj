@@ -648,6 +648,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.craftydigital.gainsville;
 				PRODUCT_NAME = Gainsville;
 			};
 			name = Debug;
@@ -668,6 +669,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.craftydigital.gainsville;
 				PRODUCT_NAME = Gainsville;
 			};
 			name = Release;
