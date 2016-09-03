@@ -1,14 +1,8 @@
-var AWS = require('aws-sdk');
-var Promise = require('bluebird');
-var uuid = require('uuid');
-var gm = require('gm').subClass({ imageMagick: true });
+'use strict';
 
-// Scaffold AWS
-AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_KEY,
-  region: process.env.AWS_REGION
-});
+const Promise = require('bluebird');
+const uuid = require('uuid');
+const ImageService = require('./ImageService');
 
 var S3 = {
   bucket: process.env.S3_BUCKET,
@@ -19,44 +13,39 @@ module.exports = {
   upload: upload
 };
 
-function upload(picture) {
+function upload(base64Image) {
   return new Promise(
     function(resolve, reject) {
-      var s3 = new AWS.S3();
-      var buffer = new Buffer(picture.replace(/^data:image\/\w+;base64,/, ""), 'base64');
-      var fileKey = uuid.v4() + '.png';
-      // Convert to JPG and compress
-      gm(buffer, fileKey)
-        .quality(60)
-        .toBuffer('JPG', function(err, jpgBuffer) {
-          if (err) {
-            return reject(err);
-          } else {
-            var params = {
-              ACL: 'public-read',
-              Key: fileKey.replace('.png', '.jpg'),
-              Bucket: S3.bucket,
-              Body: jpgBuffer,
-              ContentEncoding: 'base64',
-              ContentType: 'image/jpeg'
-            };
+      var s3 = new infrastructure.aws.S3();
+      ImageService.createImageJpg(base64Image)
+        .then(payload => {
+          let params = {
+            ACL: 'public-read',
+            Key: payload.fileName,
+            Bucket: S3.bucket,
+            Body: payload.fileBuffer,
+            ContentEncoding: 'base64',
+            ContentType: payload.contentType
+          };
 
-            s3.putObject(params, function(err, data){
-              if (err) {
-                reject(err)
-              } else {
-                // Grab the URL
-                s3.getSignedUrl('getObject',
-                  {
-                    Key: fileKey.replace('.png', '.jpg'),
-                    Bucket: S3.bucket
-                  }, function(err, url) {
-                    var unsignedUrl = url.substring(0, url.indexOf('?'));
-                    resolve({url: unsignedUrl});
-                  });
-              }
-            });
-          }
+          s3.putObject(params, function (err, data) {
+            if (err) {
+              reject(err)
+            } else {
+              // Grab the URL
+              s3.getSignedUrl('getObject',
+                {
+                  Key: payload.fileName,
+                  Bucket: S3.bucket
+                }, function (err, url) {
+                  var unsignedUrl = url.substring(0, url.indexOf('?'));
+                  resolve({url: unsignedUrl});
+                });
+            }
+          });
+        })
+        .catch(error => {
+          return reject(err);
         });
     }
   );

@@ -2,11 +2,10 @@
 
 const Hapi = require('hapi');
 const server = new Hapi.Server();
-
-var log = require('winston');
-var bootstrap = require('./bootstrap');
-var AWSService = require('./services/AWSService');
-var AuthService = require('./services/AuthService');
+const log = require('winston');
+const bootstrap = require('./bootstrap');
+const AWSService = require('./services/AWSService');
+const AuthService = require('./services/AuthService');
 
 server.connection({ port: process.env.PORT || 1338 });
 
