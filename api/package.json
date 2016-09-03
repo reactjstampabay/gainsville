@@ -1,7 +1,7 @@
 {
-  "name": "gainsville-api",
+  "name": "gainsville-media-api",
   "version": "1.0.0",
-  "description": "The Gainsville API",
+  "description": "The Gainsville Media API",
   "main": "app.js",
   "engines": {
     "node": "4.4.7"
