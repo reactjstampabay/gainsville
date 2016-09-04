@@ -1,4 +1,20 @@
 import uuid from 'uuid';
+import * as MediaService from './media';
+
+export function getLoggedInSession(accessToken, firebase) {
+  return new Promise(
+    function(resolve, reject) {
+      let temp = 'this';
+      firebase.auth().signInWithCustomToken(accessToken)
+        .then(result => {
+          resolve(result);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    }
+  );
+}
 
 export function getCurrentValue(ref) {
   return new Promise(
@@ -55,6 +71,20 @@ export function login(email, password, firebase) {
   });
 }
 
+export function logout() {
+  return new Promise(
+    (resolve, reject) => {
+      firebase.auth().signOut()
+        .then(result => {
+          resolve();
+        })
+        .catch(err => {
+          reject(err);
+        });
+    }
+  );
+}
+
 export function like(id, firebase) {
   return new Promise(
     (resolve, reject) => {
@@ -99,15 +129,18 @@ export function dislike(id, firebase) {
   );
 }
 
-export function uploadPicture(base64Image, email, firebase) {
+export function uploadPicture(base64Image, profile, firebase) {
   return new Promise(
     (resolve, reject) => {
       let picturesRef = firebase.database().ref('/pictures');
-      picturesRef
-        .child(uuid.v4())
-        .set({
-          url: 'data:image/png;base64,' + base64Image.data,
-          user_name: email
+      MediaService.uploadPicture(profile.stsTokenManager.accessToken, base64Image.data)
+        .then(response => {
+          return picturesRef
+            .child(uuid.v4())
+            .set({
+              url: response.url,
+              user_name: profile.email
+            });
         })
         .then(result => {
           return resolve(result);

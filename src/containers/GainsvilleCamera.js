@@ -5,7 +5,7 @@ import { View, Dimensions, StyleSheet, Text, TouchableHighlight } from 'react-na
 import Camera from 'react-native-camera';
 import NavigationBar from '../components/NavigationBar';
 import * as FirebaseService from '../common/services/firebase';
-import { refreshPictures } from '../common/actions/gallery';
+import { upload } from '../common/actions/gallery';
 
 class GainsvilleCamera extends Component {
   constructor(props) {
@@ -19,10 +19,7 @@ class GainsvilleCamera extends Component {
     var self = this;
     this.camera.capture()
       .then((data) => {
-        return FirebaseService.uploadPicture(data, user.profile.email, firebase.api);
-      })
-      .then(result => {
-        dispatch(refreshPictures(firebase.api));
+        dispatch(upload(data, user.profile, firebase.api));
         navigator.pop();
       })
       .catch(error => {

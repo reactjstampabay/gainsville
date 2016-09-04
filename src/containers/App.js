@@ -5,7 +5,7 @@ import {Provider} from 'react-redux';
 import configureStore from '../common/store/configureStore';
 import StartScreen from './StartScreen';
 import _ from 'lodash';
-import { receiveProfile } from '../common/actions/user';
+import { getLoggedInSession, receiveProfile } from '../common/actions/user';
 import { ASYNC_STORAGE_KEY } from '../common/constants';
 
 const store = configureStore();
@@ -36,6 +36,8 @@ class App extends Component {
       .then(profile => {
         if (profile) {
           store.dispatch(receiveProfile(JSON.parse(profile), firebase));
+          // TODO: Properly wire up the code below to verify profile is still good
+          //store.dispatch(getLoggedInSession(JSON.parse(profile), firebase));
         }
       });
   }
