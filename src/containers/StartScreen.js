@@ -113,10 +113,6 @@ class StartScreen extends Component {
             <View style={[styles.formContainerLast]}>
               {loginButton}
             </View>
-            <Image style={{
-              height: window.height - 80,
-              width: window.height - 80
-            }} source={{uri: 'http://2.bp.blogspot.com/_H8hh1K-R3qo/TUHuC4TMatI/AAAAAAAAAMg/heH-xvbb1Uw/s1600/iron-sheik.JPG'}}/>
           </View>
         </Image>
       </KeyboardAvoidingView>
