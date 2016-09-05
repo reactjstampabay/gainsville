@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 
 import { like, dislike } from '../common/actions/gallery';
-
+import ImagePreloader from './ImagePreloader';
 import clamp from 'clamp';
 
 var SWIPE_THRESHOLD = 160;
@@ -21,6 +21,7 @@ class Swiper extends Component {
     super(props);
 
     this.state = {
+      loading: false,
       pan: new Animated.ValueXY(),
       enter: new Animated.Value(1.0)
     };
@@ -34,6 +35,7 @@ class Swiper extends Component {
   _swipedLeft() {
     const { dispatch, gallery, firebase } = this.props;
     dispatch(dislike(gallery.pictures[gallery.currentIndex].id, firebase.api));
+
   }
 
   _swipedRight() {
@@ -97,10 +99,14 @@ class Swiper extends Component {
     } else if (this.state.pan.x._value < 0) {
       // Swiped Left
       this._swipedLeft();
-
     }
-    this.state.pan.setValue({x: 0, y: 0});
-    this.state.enter.setValue(1.0);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.gallery.currentIndex !== nextProps.gallery.currentIndex) {
+      this.state.pan.setValue({x: 0, y: 0});
+      this.state.enter.setValue(1.0);
+    }
   }
 
   render() {
@@ -126,7 +132,7 @@ class Swiper extends Component {
     let picture = gallery.currentIndex > -1 && gallery.status === 'refreshed' ? gallery.pictures[gallery.currentIndex] : {url: 'https://gainsville.firebaseapp.com/spinner.gif'};
 
     return (
-      <View style={styles.container}>
+      <View style={[styles.container]}>
         <Animated.View style={[styles.card, animatedCardStyles]} {...this._panResponder.panHandlers}>
           <Image style={[styles.card]} source={{uri: picture.url}}></Image>
         </Animated.View>
@@ -138,6 +144,7 @@ class Swiper extends Component {
         <Animated.View style={[styles.yup, animatedYupStyles]}>
           <Text style={styles.yupText}>Nice gains, bruh!</Text>
         </Animated.View>
+        <ImagePreloader gallery={gallery} />
       </View>
     );
   }
@@ -146,7 +153,7 @@ class Swiper extends Component {
 var window = Dimensions.get('window');
 var styles = StyleSheet.create({
   container: {
-    paddingTop: 120,
+    paddingTop: 70,
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',

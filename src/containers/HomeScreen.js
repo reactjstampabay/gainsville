@@ -6,7 +6,8 @@ import {
   Dimensions,
   Text,
   Image,
-  TouchableHighlight
+  TouchableHighlight,
+  ActivityIndicator
 } from 'react-native';
 
 import { connect } from 'react-redux';
@@ -14,6 +15,7 @@ import { refreshPictures } from '../common/actions/gallery';
 import Swiper from '../components/Swiper';
 import NavigationBar from '../components/NavigationBar';
 import GainsvilleCamera from './GainsvilleCamera';
+import UploadIndicator from '../components/UploadIndicator';
 
 let window = Dimensions.get('window');
 
@@ -41,6 +43,7 @@ class HomeScreen extends Component {
     return (
       <Image style={[styles.background]} source={require('../assets/images/background.png')} resizeMode="cover">
         <NavigationBar hasLogoutButton={true} navigator={navigator} dispatch={dispatch}></NavigationBar>
+        {gallery.uploading.image && <UploadIndicator gallery={gallery} />}
         <Swiper user={user} gallery={gallery} firebase={firebase} navigator={navigator} dispatch={dispatch}></Swiper>
         <TouchableHighlight onPress={this._showYourGains} style={[styles.cameraButton]}>
           <Text style={[styles.cameraButtonText]}>Show Your Gains</Text>
@@ -50,7 +53,7 @@ class HomeScreen extends Component {
   }
 }
 
-var styles = StyleSheet.create({
+let styles = StyleSheet.create({
   background: {
     flex: 1,
     height: window.height,
